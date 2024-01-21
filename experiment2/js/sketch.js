@@ -1,67 +1,43 @@
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date:
-
-// Here is how you might set up an OOP p5.js project
-// Note that p5.js looks for a file called sketch.js
-
-// Constants - User-servicable parts
-// In a longer project I like to put these in a separate file
-const VALUE1 = 1;
-const VALUE2 = 2;
-
-// Globals
-let myInstance;
-let canvasContainer;
-
-class MyClass {
-    constructor(param1, param2) {
-        this.property1 = param1;
-        this.property2 = param2;
+// class to store cube information
+class Cube {
+    constructor(rotationSpeed, cubeColor) {
+      this.size = 100; // size of the cube
+      this.rotationAngles = createVector(0, 0, 0); // angle of the cube object's rotation
+      this.color = cubeColor 
+      this.vector = createVector(rotationSpeed, rotationSpeed, rotationSpeed) // 3d vector to change the speed of the rotation
     }
-
-    myMethod() {
-        // code to run when method is called
+  
+    update() {
+      this.rotationAngles.add(this.vector); // add the rotational vector to the rotation angle
+      push();
+      fill(this.color);
+      stroke(50,50,50);
+      rotateX(this.rotationAngles.x);
+      rotateY(this.rotationAngles.y);
+      rotateZ(this.rotationAngles.z);
+      // https://p5js.org/reference/#/p5/box
+      box(this.size);
+      pop();
     }
-}
-
-// setup() function is called once when the program starts
-function setup() {
-    // place our canvas, making it fit our container
-    canvasContainer = $("#canvas-container");
-    let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
-    canvas.parent("canvas-container");
-    // resize canvas is the page is resized
-    $(window).resize(function() {
-        console.log("Resizing...");
-        resizeCanvas(canvasContainer.width(), canvasContainer.height());
-    });
-    // create an instance of the class
-    myInstance = new MyClass(VALUE1, VALUE2);
-
-    var centerHorz = windowWidth / 2;
-    var centerVert = windowHeight / 2;
-}
-
-// draw() function is called repeatedly, it's the main animation loop
-function draw() {
-    background(220);    
-    // call a method on the instance
-    myInstance.myMethod();
-
-    // Put drawings here
-    var centerHorz = canvasContainer.width() / 2 - 125;
-    var centerVert = canvasContainer.height() / 2 - 125;
-    fill(234, 31, 81);
-    noStroke();
-    rect(centerHorz, centerVert, 250, 250);
-    fill(255);
-    textStyle(BOLD);
-    textSize(140);
-    text("p5*", centerHorz + 10, centerVert + 200);
-}
-
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
-}
+  }
+  
+  let cubes = [];
+  
+  function setup() {
+    createCanvas(400, 400, WEBGL); // WebGL build for 3d models
+    
+    // push in 10 cube objects into array
+    for (let i = 1; i < 10; i++) {
+      let cubeColor = color(random(255), random(255), random(255)); // random color for each cube
+      cubes.push(new Cube(i * 0.0005, cubeColor));
+    }
+  }
+  
+  function draw() {
+    background(50,50,50);
+  
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
+    cubes.forEach((element => element.update()));
+  }
+  
+  
