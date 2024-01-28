@@ -1,67 +1,50 @@
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date:
-
-// Here is how you might set up an OOP p5.js project
-// Note that p5.js looks for a file called sketch.js
-
-// Constants - User-servicable parts
-// In a longer project I like to put these in a separate file
-const VALUE1 = 1;
-const VALUE2 = 2;
-
-// Globals
-let myInstance;
-let canvasContainer;
-
-class MyClass {
-    constructor(param1, param2) {
-        this.property1 = param1;
-        this.property2 = param2;
-    }
-
-    myMethod() {
-        // code to run when method is called
-    }
-}
-
-// setup() function is called once when the program starts
 function setup() {
-    // place our canvas, making it fit our container
-    canvasContainer = $("#canvas-container");
-    let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
-    canvas.parent("canvas-container");
-    // resize canvas is the page is resized
-    $(window).resize(function() {
-        console.log("Resizing...");
-        resizeCanvas(canvasContainer.width(), canvasContainer.height());
-    });
-    // create an instance of the class
-    myInstance = new MyClass(VALUE1, VALUE2);
-
-    var centerHorz = windowWidth / 2;
-    var centerVert = windowHeight / 2;
-}
-
-// draw() function is called repeatedly, it's the main animation loop
-function draw() {
-    background(220);    
-    // call a method on the instance
-    myInstance.myMethod();
-
-    // Put drawings here
-    var centerHorz = canvasContainer.width() / 2 - 125;
-    var centerVert = canvasContainer.height() / 2 - 125;
-    fill(234, 31, 81);
-    noStroke();
-    rect(centerHorz, centerVert, 250, 250);
-    fill(255);
-    textStyle(BOLD);
-    textSize(140);
-    text("p5*", centerHorz + 10, centerVert + 200);
-}
-
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
-}
+    createCanvas(800, 800);
+  }
+  
+  function draw() {
+    // code from chatgpt
+    let bgColor = color(255, 255, 255);
+    let colorIndex = frameCount % 200;
+    if (colorIndex < 67) {
+      bgColor = color(0, 160, 255);
+    } else if (colorIndex < 134) {
+      bgColor = color(0, 0, 255);
+    } else {
+      bgColor = color(0, 90, 255);
+    }
+    
+    background(bgColor);
+  
+    translate(width / 2, height / 2);
+  
+    beginShape();
+    for (let i = 0; i < frameCount; i++) {
+      let angle = map(i, 0, 360, 0, TWO_PI);
+      let radius = noise(i) * 100 + i/20;
+  
+      let x = radius * cos(angle);
+      let y = radius * sin(angle);
+  
+  // code from chatgpt
+      let colorIndex = frameCount % 200;
+      if (colorIndex < 67) {
+        fill(255, 0, 0);
+      } else if (colorIndex < 134) {
+        fill(255, 165, 0);
+      } else {
+        fill(255, 255, 0);
+      }
+  // code from chatgpt
+      if (colorIndex < 67) {
+        stroke(255, 255, 0);
+      } else if (colorIndex < 134) {
+        stroke(255, 0, 0);
+      } else {
+        stroke(255, 165, 0); 
+      }
+      vertex(x, y);
+    }
+    endShape();
+  }
+  
