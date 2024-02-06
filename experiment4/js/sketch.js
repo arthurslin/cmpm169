@@ -1,67 +1,146 @@
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date:
+let img;
+let dotRadius = 2;
+let currentPattern = 0;
+let patterns = [];
+let zoomFactor = 1;
+let uploadedImage; // Variable to store dynamically loaded image
 
-// Here is how you might set up an OOP p5.js project
-// Note that p5.js looks for a file called sketch.js
-
-// Constants - User-servicable parts
-// In a longer project I like to put these in a separate file
-const VALUE1 = 1;
-const VALUE2 = 2;
-
-// Globals
-let myInstance;
-let canvasContainer;
-
-class MyClass {
-    constructor(param1, param2) {
-        this.property1 = param1;
-        this.property2 = param2;
-    }
-
-    myMethod() {
-        // code to run when method is called
-    }
+function preload() {
+  img = loadImage("moo.jpg");
 }
 
-// setup() function is called once when the program starts
 function setup() {
-    // place our canvas, making it fit our container
-    canvasContainer = $("#canvas-container");
-    let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
-    canvas.parent("canvas-container");
-    // resize canvas is the page is resized
-    $(window).resize(function() {
-        console.log("Resizing...");
-        resizeCanvas(canvasContainer.width(), canvasContainer.height());
-    });
-    // create an instance of the class
-    myInstance = new MyClass(VALUE1, VALUE2);
+  createCanvas(windowWidth, windowHeight);
+  noLoop();
+  document.addEventListener("keydown", handleKeyPress);
 
-    var centerHorz = windowWidth / 2;
-    var centerVert = windowHeight / 2;
+  patterns.push(drawCircle);
+  patterns.push(drawTriangle);
+  patterns.push(drawSquare);
+  patterns.push(drawHeart);
 }
 
-// draw() function is called repeatedly, it's the main animation loop
 function draw() {
-    background(220);    
-    // call a method on the instance
-    myInstance.myMethod();
-
-    // Put drawings here
-    var centerHorz = canvasContainer.width() / 2 - 125;
-    var centerVert = canvasContainer.height() / 2 - 125;
-    fill(234, 31, 81);
-    noStroke();
-    rect(centerHorz, centerVert, 250, 250);
-    fill(255);
-    textStyle(BOLD);
-    textSize(140);
-    text("p5*", centerHorz + 10, centerVert + 200);
+  drawMosaic(dotRadius, color(30, 30, 30));
 }
 
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
+function drawMosaic(dotRadius, backgroundColor) {
+  background(backgroundColor);
+
+  for (let i = 0; i < numberOfColumns(dotRadius); i++) {
+    let offsetX = i * columnWidth(dotRadius);
+    drawColumnDots(dotRadius, offsetX);
+  }
+}
+
+const columnWidth = (dotRadius) => dotRadius * 3;
+
+const numberOfColumns = (dotRadius) =>
+  Math.ceil(width / columnWidth(dotRadius));
+
+function drawColumnDots(dotRadius, offsetX) {
+  let dotDiameter = 2 * dotRadius * zoomFactor;
+  let dotHeightWithPadding = dotDiameter + 2;
+  let numDotsInColumn = Math.floor(height / dotHeightWithPadding);
+  let topY = Math.floor(random(10));
+
+  for (let i = 0; i < numDotsInColumn; i++) {
+    let centerX = Math.floor(
+      random(offsetX + dotRadius, offsetX + columnWidth(dotRadius) - dotRadius)
+    );
+    let centerY = topY + i * dotHeightWithPadding + dotRadius;
+
+    patterns[currentPattern](dotRadius, centerX, centerY, dotDiameter);
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+function handleKeyPress(event) {
+  if (event.key === "ArrowUp") {
+    dotRadius += 1;
+  } else if (event.key === "ArrowDown" && dotRadius > 1) {
+    dotRadius -= 1;
+  } else if (event.key === "p") {
+    currentPattern = (currentPattern + 1) % patterns.length;
+  } else if (event.key === "z") {
+    zoomFactor *= 1.2;
+  } else if (event.key === "x") {
+    zoomFactor /= 1.2;
+  } else if (event.key === "s") {
+    // Save the canvas as an image when 'S' key is pressed
+    saveCanvas("mosaic", "png");
+  } else if (event.key === "l") {
+    // Load a new image when 'L' key is pressed
+    loadNewImage();
+  }
+
+  redraw();
+}
+
+function drawCircle(dotRadius, centerX, centerY, dotDiameter) {
+  let dotColor = getCurrentColor(centerX, centerY);
+  noStroke();
+  fill(dotColor);
+  ellipse(centerX, centerY, dotDiameter, dotDiameter);
+}
+
+function drawTriangle(dotRadius, centerX, centerY, dotDiameter) {
+  let dotColor = getCurrentColor(centerX, centerY);
+  noStroke();
+  fill(dotColor);
+  drawTriangleShape(centerX, centerY, dotDiameter / 2);
+}
+
+function drawSquare(dotRadius, centerX, centerY, dotDiameter) {
+  let dotColor = getCurrentColor(centerX, centerY);
+  noStroke();
+  fill(dotColor);
+  rectMode(CENTER);
+  rect(centerX, centerY, dotDiameter, dotDiameter);
+}
+
+function drawHeart(dotRadius, centerX, centerY, dotDiameter) {
+  let dotColor = getCurrentColor(centerX, centerY);
+  noStroke();
+  fill(dotColor);
+  drawHeartShape(centerX, centerY, dotDiameter / 2);
+}
+
+function drawTriangleShape(x, y, size) {
+  beginShape();
+  vertex(x, y - size);
+  vertex(x + (size * sqrt(3)) / 2, y + size / 2);
+  vertex(x - (size * sqrt(3)) / 2, y + size / 2);
+  endShape(CLOSE);
+}
+
+function drawHeartShape(x, y, size) {
+  beginShape();
+  vertex(x, y);
+  bezierVertex(x - size, y - size, x - 2 * size, y + size / 2, x, y + 2 * size);
+  bezierVertex(x + 2 * size, y + size / 2, x + size, y - size, x, y);
+  endShape(CLOSE);
+}
+
+function getCurrentColor(x, y) {
+  return uploadedImage ? uploadedImage.get(x, y) : img.get(x, y);
+}
+
+function loadNewImage() {
+  // Function to load a new image dynamically
+  let fileInput = createFileInput(handleFile);
+  fileInput.position(10, 10);
+  fileInput.elt.click(); // Simulate a click on the file input to open the file selection dialog
+}
+
+function handleFile(file) {
+  // Callback function to handle the selected file
+  if (file.type === "image") {
+    uploadedImage = loadImage(file.data, redraw);
+  } else {
+    alert("Please select a valid image file.");
+  }
 }
