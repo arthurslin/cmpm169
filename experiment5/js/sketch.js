@@ -1,67 +1,105 @@
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date:
+let angle = 0;
+let sunRotationSpeed = 0.1;
+let sunRadius = 80;
+let numPlanets = 8;
+let planetSizes = [16, 12, 10, 8, 6, 4, 4, 2];
+let planetDistances = [200, 280, 380, 460, 540, 620, 700, 750];
+let planetDepths = [105, 120, 130, 140, 160, 180, 200, 220];
+let rotationSpeed = [];
+let phaseShifts = [];
+let inclinations = [];
 
-// Here is how you might set up an OOP p5.js project
-// Note that p5.js looks for a file called sketch.js
+let camAngleX = 0;
+let camAngleY = 0;
 
-// Constants - User-servicable parts
-// In a longer project I like to put these in a separate file
-const VALUE1 = 1;
-const VALUE2 = 2;
+let numStars = 500;
+let maxStarDistance = 2000;
 
-// Globals
-let myInstance;
-let canvasContainer;
+let stars = [];
 
-class MyClass {
-    constructor(param1, param2) {
-        this.property1 = param1;
-        this.property2 = param2;
-    }
-
-    myMethod() {
-        // code to run when method is called
-    }
-}
-
-// setup() function is called once when the program starts
 function setup() {
-    // place our canvas, making it fit our container
-    canvasContainer = $("#canvas-container");
-    let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
-    canvas.parent("canvas-container");
-    // resize canvas is the page is resized
-    $(window).resize(function() {
-        console.log("Resizing...");
-        resizeCanvas(canvasContainer.width(), canvasContainer.height());
-    });
-    // create an instance of the class
-    myInstance = new MyClass(VALUE1, VALUE2);
-
-    var centerHorz = windowWidth / 2;
-    var centerVert = windowHeight / 2;
+  createCanvas(1600, 800, WEBGL);
+  for (let i = 0; i < numPlanets; i++) {
+    rotationSpeed.push(random(0.05, 0.2));
+    // From the angles 0 to 2pi, shift planets draw point
+    phaseShifts.push(random(2*PI));
+    // Rotation inclination set between -pi/4 and pi/4 to minimize angular variance
+    inclinations.push(random(-PI/4, PI/4));
+  }
+// push numStars stars into array
+  for (let i = 0; i < numStars; i++) {
+    let x = random(-maxStarDistance, maxStarDistance);
+    let y = random(-maxStarDistance, maxStarDistance);
+    let z = random(-maxStarDistance, maxStarDistance);
+    stars.push(createVector(x, y, z));
+  }
 }
 
-// draw() function is called repeatedly, it's the main animation loop
 function draw() {
-    background(220);    
-    // call a method on the instance
-    myInstance.myMethod();
+  background(0);
+  // ChatGPT camera logic
+  camAngleX = map(mouseX, 0, width, -PI, PI);
+  camAngleY = map(mouseY, 0, height, -PI/2, PI/2);
 
-    // Put drawings here
-    var centerHorz = canvasContainer.width() / 2 - 125;
-    var centerVert = canvasContainer.height() / 2 - 125;
-    fill(234, 31, 81);
-    noStroke();
-    rect(centerHorz, centerVert, 250, 250);
-    fill(255);
-    textStyle(BOLD);
-    textSize(140);
-    text("p5*", centerHorz + 10, centerVert + 200);
+  rotateX(-camAngleY);
+  rotateY(camAngleX);
+
+  drawStars();
+
+  push();
+  stroke(255, 165, 0);
+  fill(255, 255, 0);
+  rotateY(angle * sunRotationSpeed);
+  sphere(sunRadius);
+  pop();
+
+  for (let i = 0; i < numPlanets; i++) {
+    let planetAngle = angle + (rotationSpeed[i] * 0.01) + phaseShifts[i];
+    let x = cos(planetAngle) * planetDistances[i];
+    let y = 0;
+    let z = sin(planetAngle) * planetDepths[i];
+    let planetSize = planetSizes[i];
+    let inclination = inclinations[i];
+
+    push();
+    rotateX(inclination);
+    translate(x, y, z);
+    let planetStrokeColor = getPlanetColor(i);
+    stroke(planetStrokeColor);
+    fill(0);
+    sphere(planetSize);
+    pop();
+  }
+
+  angle += 0.01;
 }
 
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
+// star drawing function
+function drawStars() {
+  noStroke();
+  fill(255);
+  for (let i = 0; i < numStars; i++) {
+    let starSize = random(1, 3);
+    let starPos = stars[i];
+    push();
+    translate(starPos.x, starPos.y, starPos.z);
+    sphere(starSize);
+    pop();
+  }
+}
+
+// ChatGPT color function
+function getPlanetColor(index) {
+  let planetColors = [
+    color(255, 69, 0),
+    color(255, 165, 0),
+    color(255, 215, 0),
+    color(165, 42, 42),
+    color(255, 255, 0),
+    color(255, 255, 224),
+    color(173, 216, 230),
+    color(0, 191, 255)
+  ];
+
+  return planetColors[index % planetColors.length];
 }
