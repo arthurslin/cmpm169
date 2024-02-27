@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This title is used for tabs and bookmarks -->
+    <title>Experiment 7 - Image DataSort</title>
+
+    <!-- Use UTF character set, a good idea with any webpage -->
+    <meta charset="UTF-8" />
+    <!-- Set viewport so page remains consistently scaled w narrow devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Include CSS file, including a site-wide CSS and for this particular page -->
+    <link rel="stylesheet" type="text/css" href="../css/site.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+    <!-- Load jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <!-- Load p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.js"></script>
+
+    <!-- Link to javascript files - DEFER waits until all elements are rendered -->
+    <!-- Use me for a JavaScript OOP Project -->
+    <script type="text/javascript" src="./js/project.js" defer></script>
+    <!-- Use me for a p5.js project -->
+    <script type="text/javascript" src="./js/sketch.js" defer></script>
+  </head>
+  <body>
+    <!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
+    <main id="content">
+      <section>
+        <h1>Experiment 7 - Image DataSort</h1>
+        <div class="minor-section">
+          <h2>Imitate</h2>
+          <p>
+            For this experiment, there was one way of data visualization that I
+            really liked and it was the photos shown as just the primary colors.
+            Here is the link. https://shirleywu.studio/travel/
+          </p>
+        </div>
+
+        <div class="minor-section">
+          <h2>Integrate</h2>
+          <p>
+            At first, I thought about the picture(s) that I would input and how
+            I would visualize the data that came from the images. I realized
+            that I needed to get the pixels of the image and load them into a
+            data structure so that manipulation could be done. At first I wanted
+            to figure out how I can even access the pixels in a way that they
+            could be manipulated. I found out that p5js has both a get and set
+            method for image objects. So I was able to get the pixels into an
+            array pretty easily. I utilized a double for loop, with the
+            parameters of the image.height and the image.width for the looping.
+            Each iteration, I would use image.get(i,j) at each iteration and
+            push that information into an array.
+          </p>
+        </div>
+
+        <div class="minor-section">
+          <h2>Innovate</h2>
+          <p>
+            Now that I had all of the data required in a REALLY big 2d array, I
+            thought about sorting the data. I first tried the brightness, but
+            that was uninteresting so I decided to sort by the color of the
+            image. I created a heuristic to sort the colors by red, then green,
+            then blue. The way that I did this was creating an integer for the
+            “sorted value” which was the red color multiplied by 1 million, the
+            green color multiplied by 1000 and the blue color multiplied by 1.
+            The reason that the values are this far apart is because RGB values
+            are 3 digits, and we need to account for the max value of 255 in
+            order to sort properly. The result is very satisfying. Image on the
+            left and result on the right.
+          </p>
+        </div>
+
+        <div class="minor-section">
+          <h2>Reflection</h2>
+          <p>
+            I really liked this assignment because it shows that there are many
+            things that can be classified as “data”. Data visualization is a
+            very interesting topic and there is a lot of satisfaction to be had.
+            Rearranging the pixels of an image was definitely a tough task
+            because we are dealing with 100,000 + pixels per image. I think if I
+            wanted to take it a step further I would sort by the brightness as
+            another heuristic. Currently it is only sorted by the color values,
+            so more red = higher value. Overall, I did learn a little more about
+            getting information from images and I am going to explore this more
+            in a future project.
+          </p>
+        </div>
+
+        <div class="minor-section">
+          <h2>Results</h2>
+          <p>
+            Here is the image on the left, then the sorted data on the right.
+          </p>
+        </div>
+      </section>
+      <nav id="links">
+        <!-- Put links to other pages (including the homepage) here. -->
+      </nav>
+    </main>
+  </body>
+</html>
